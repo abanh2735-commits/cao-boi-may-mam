@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -65,16 +64,28 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(25px, 7vw, 38px);
+    overflow: hidden; /* Cắt phần ảnh thừa nếu có để giữ bo góc */
+    padding: 2px;
+}
+
+/* Định dạng cho ảnh người thật bên trong ô vuông */
+.cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Giúp ảnh vừa khít ô vuông mà không bị méo */
+    border-radius: 5px;
+    display: block;
 }
 
 .cell.win {
     animation: glow .4s infinite alternate;
+    border-color: gold;
+    z-index: 2;
 }
 
 @keyframes glow {
     from { transform: scale(1); filter: brightness(1); }
-    to { transform: scale(1.12); filter: brightness(1.7); }
+    to { transform: scale(1.12); filter: brightness(1.5); }
 }
 
 .info {
@@ -177,7 +188,6 @@ button:disabled {
     color: #e6c99a;
     margin-top: 12px;
 }
-
 </style>
 </head>
 
@@ -235,13 +245,23 @@ button:disabled {
 <script>
 
 // =========================
-// 1. KHAI BÁO DỮ LIỆU
+// 1. KHAI BÁO DỮ LIỆU ẢNH
 // =========================
 
 const symbols = [
-    "🤠", "⭐", "🔫", "🍾", "🃏",
-    "A", "K", "Q", "J", "💎"
+    "92dc227d-e7c6-4327-8252-71c40acff0ed.jfif",
+    "Ảnh chụp màn hình 2026-11-20 191916.png",
+    "Ảnh chụp màn hình 2026-11-20 192041.png",
+    "Ảnh chụp màn hình 2026-11-20 192406.png",
+    "f352efb8-e486-45e3-ab3e-4a1055502455.jfif",
+    "fb63bd4f-052b-473c-b33e-3c021c5cd8eb.jfif"
 ];
+
+// Tải trước ảnh để lúc quay không bị giật/trắng ô
+symbols.forEach(src => {
+    const img = new Image();
+    img.src = src;
+});
 
 let balance = 1000;
 let bet = 10;
@@ -283,7 +303,7 @@ function createGrid() {
 }
 
 // =========================
-// 3. HIỂN THỊ BIỂU TƯỢNG
+// 3. HIỂN THỊ BIỂU TƯỢNG (ẢNH)
 // =========================
 
 function drawGrid(grid) {
@@ -292,15 +312,17 @@ function drawGrid(grid) {
 
     grid.forEach((row, r) => {
 
-        row.forEach((symbol, c) => {
+        row.forEach((symbolSrc, c) => {
 
             let cell = document.createElement("div");
-
             cell.className = "cell";
-            cell.textContent = symbol;
-
             cell.id = `cell-${r}-${c}`;
 
+            let img = document.createElement("img");
+            img.src = symbolSrc;
+            img.alt = "Biểu tượng";
+
+            cell.appendChild(img);
             reels.appendChild(cell);
 
         });
